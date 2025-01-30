@@ -54,7 +54,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// File storage
+// File storage .
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes will be written here 
