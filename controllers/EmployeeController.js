@@ -76,7 +76,7 @@ const getEmployeeById = async (req, res) => {
   try {
       // Fetch the employee by ID
       const employee = await Employee.findOne({_id:id , isDeleted:false});
-      const employee = await Employee.findOne({_id:id , isDeleted:false});
+      
       console.log(id);
       console.log(employee);
 
@@ -93,39 +93,39 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
-const updateEmployee = async (req, res) => {
-  const { id } = req.params; // Employee ID from URL
-  const updates = req.body; // Fields to update
-  const file = req.files.identityCard ? req.files.identityCard[0] : null;
+// const updateEmployee = async (req, res) => {
+//   const { id } = req.params; // Employee ID from URL
+//   const updates = req.body; // Fields to update
+//   const file = req.files.identityCard ? req.files.identityCard[0] : null;
 
-  try {
+//   try {
 
-    if (file) {
-      if (!file.mimetype.startsWith("image/")) {
-        return res.status(400).json({ error: "Invalid file type for identity card" });
-      }
-      updates.identityCard = file.path; // Set file path in the updates
-    }
-    // Check if employee exists and update dynamically
-    const updatedEmployee = await Employee.findByIdAndUpdate(
-      id,
-      { $set: updates }, // Update only provided fields
-      { new: true, runValidators: true } // Return updated doc & validate fields
-    );
+//     if (file) {
+//       if (!file.mimetype.startsWith("image/")) {
+//         return res.status(400).json({ error: "Invalid file type for identity card" });
+//       }
+//       updates.identityCard = file.path; // Set file path in the updates
+//     }
+//     // Check if employee exists and update dynamically
+//     const updatedEmployee = await Employee.findByIdAndUpdate(
+//       id,
+//       { $set: updates }, // Update only provided fields
+//       { new: true, runValidators: true } // Return updated doc & validate fields
+//     );
 
-    if (!updatedEmployee) {
-      return res.status(404).json({ error: 'Employee not found' });
-    }
+//     if (!updatedEmployee) {
+//       return res.status(404).json({ error: 'Employee not found' });
+//     }
 
-    return res.status(200).json(updatedEmployee); // Return updated data
-  } catch (error) {
-    console.error('Error updating employee:', error.message);
-    if (error.kind === 'ObjectId') {
-      return res.status(400).json({ error: 'Invalid employee ID' });
-    }
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-};
+//     return res.status(200).json(updatedEmployee); // Return updated data
+//   } catch (error) {
+//     console.error('Error updating employee:', error.message);
+//     if (error.kind === 'ObjectId') {
+//       return res.status(400).json({ error: 'Invalid employee ID' });
+//     }
+//     return res.status(500).json({ error: 'Internal server error' });
+//   }
+// };
 const updateEmployee = async (req, res) => {
   const { id } = req.params; // Employee ID from URL
   const updates = req.body; // Fields to update
