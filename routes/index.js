@@ -12,6 +12,8 @@ const router = Router();
 // router.get('/', AuthController.index);
 router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
+router.get('/auth/google', AuthController.googleAuth);
+router.get('/auth/google/callback', AuthController.googleAuthCallback)
 
 router.post('/employee',isAuthenticated, upload,  EmployeeController.createEmployee);
 router.get('/employee',isAuthenticated,EmployeeController.getEmployees);

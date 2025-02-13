@@ -54,7 +54,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// File storage
+// File storage .
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes will be written here 
@@ -62,9 +62,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/', routes);
 
 // App Start
-app.listen(PORT, (error) => {
-  if (!error)
-    console.log("Server is Successfully Running, on http://localhost:" + PORT);
-  else
-    console.log("Error occurred, server can't start", error);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
+
+// app.get("/", (req, res) => {
+//   res.send("Hello, Vercel!");
+// });
+
+ module.exports = app;  
