@@ -11,7 +11,7 @@ const Employee = require("../models/Attendance");
 //   };
 const recordAttendance = async (req, res) => {
   const { id } = req.params; // Extracting the employee ID from request parameters
-  console.log(req.params);
+
   const attendanceData = req.body; // Extracting attendance data from request body
 
   try {
@@ -77,7 +77,8 @@ const fetchAttendance = async (req, res) => {
       filters.date = { $gte: startOfDayUTC, $lte: endOfDayUTC };
     }
 
-    console.log(date); // Log the normalized date for debugging
+ 
+ 
 
     const options = {
       page: parseInt(page, 10),
@@ -102,7 +103,7 @@ const fetchAttendance = async (req, res) => {
 
 const fetchMonthlyAttendance = async (req, res) => {
   const { employeeId, month: monthStr, year: yearStr } = req.query;
-  console.log("Query Params:", req.query);
+
 
   try {
     // Parse month and year as integers
@@ -125,7 +126,6 @@ const fetchMonthlyAttendance = async (req, res) => {
       console.warn("Invalid month or year provided");
     }
 
-    console.log("Filters:", filters);
 
     // Fetch attendance records from the database
     const attendanceRecords = await Attendance.find(filters).populate("employeeId");
@@ -165,9 +165,9 @@ const fetchMonthlyAttendance = async (req, res) => {
 
 
 const fetchAttendanceById = async (req, res) => {
-  console.log(req);
+
   const { employeeId } = req.params; // Extracting the ID from request parameters
-  console.log(req.params, "Here is the params");
+;
   try {
     // Fetch attendance record by ID and populate employee details
     const attendance = await Attendance.find({ employeeId }).populate(
@@ -192,8 +192,7 @@ const updateAttendance = async (req, res) => {
   const { employeeId } = req.params; // Assuming employeeId is passed as a route parameter
   const updateData = req.body; // Fields to update (e.g., checkIn, checkOut)
 
-  console.log("Employee ID:", employeeId);
-  console.log("Update Data:", updateData);
+
 
   try {
     // Validate employeeId and updateData
@@ -221,9 +220,7 @@ const updateAttendance = async (req, res) => {
     startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day in IST
     const endOfDay = new Date(attendanceDate);
     endOfDay.setUTCHours(23, 59, 59, 999); // End of the day in IST
-    
-    console.log("Adjusted Start of Day (IST):", startOfDay);
-    console.log("Adjusted End of Day (IST):", endOfDay);
+   
 
     // Attempt to find an existing attendance record for the specific employee and date
     const existingAttendance = await Attendance.findOne({
@@ -273,9 +270,9 @@ const updateAttendance = async (req, res) => {
 
 const deleteAttendance = async (req, res) => {
   const { employeeId } = req.params; // Extracting the ID from request parameters
-  console.log(req.params, "Here is the params");
+
   try {
-    console.log("Attempting to delete attendance for employeeId:", employeeId);
+  
     const deletedAttendance = await Attendance.findOneAndDelete(employeeId);
     if (!deletedAttendance) {
       throw new Error("Attendance record not found");

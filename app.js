@@ -63,8 +63,12 @@ app.use('/', routes);
 
 // App Start
 
-app.get("/", (req, res) => {
-  res.send("Hello, Vercel!");
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
-module.exports = app;  
+// app.get("/", (req, res) => {
+//   res.send("Hello, Vercel!");
+// });
+
+ module.exports = app;  

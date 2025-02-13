@@ -23,11 +23,14 @@ const userSchema = new Schema({
     maxlength: [255, 'Email length must be between 1 and 255 characters']
   },
   
-  firebaseId:{
-    type : String,
-     required: true,
-   
-  }
+  password: {
+    type: String,
+  
+    
+},
+googleId: {
+   type: String, unique: true, sparse: true
+   }, // Sparse allows null values
 }, { timestamps: true });
 userSchema.plugin(aggregatePaginate)
 const User = mongoose.model('User', userSchema);
