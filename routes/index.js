@@ -5,6 +5,7 @@ const AttendanceController = require('../controllers/AttendanceController');
 const PayrollController = require('../controllers/PayrollController');
 const { isAuthenticated } = require('../middlewares/Authenticated');
 const {upload}  = require('../middlewares/upload');
+const { route } = require('../app');
 // const upload = require('../utils/multerConfig'); // Import the multer configuration
 
 const router = Router();
@@ -14,6 +15,8 @@ router.post('/signup', AuthController.signup);
 router.post('/login', AuthController.login);
 router.get('/auth/google', AuthController.googleAuth);
 router.get('/auth/google/callback', AuthController.googleAuthCallback)
+
+
 
 router.post('/employee',isAuthenticated, upload,  EmployeeController.createEmployee);
 router.get('/employee',isAuthenticated,EmployeeController.getEmployees);

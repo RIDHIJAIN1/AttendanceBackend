@@ -1,41 +1,42 @@
-const { OAuth2Client } = require("google-auth-library");
+// isAuthenticated.js (middleware)
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-const isAuthenticated = async (req, res, next) => {
+ const isAuthenticated = async (req, res, next) => {
+  try {
     const token = req.headers.authorization?.split(" ")[1];
+    console.log("token" , token)
 
     if (!token) {
-        return res.status(401).json({ success: false, message: "No token provided" });
+      return res.status(401).json({
+        success: false,
+        message: "No token provided",
+      });
+    }
+    
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decoded" , decoded)
+
+    req.user = await User.findById(decoded.id);
+
+console.log("decoded " , req.user)
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    try {
-        const decoded = jwt.decode(token, { complete: true });
+    next();
+  } catch (error) {
+    console.error("Authentication error:", error);
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
 
-        if (!decoded || !decoded.header || !decoded.header.kid) {
-            throw new Error("Invalid token format");
-        }
-
-        if (decoded.header.alg === "RS256") {
-            // 🔹 Google Sign-In Verification
-            const ticket = await client.verifyIdToken({
-                idToken: token,
-                audience: process.env.GOOGLE_CLIENT_ID,
-            });
-
-            req.user = ticket.getPayload(); // Extract user data
-        } else {
-            // 🔹 Normal JWT Login
-            req.user = jwt.verify(token, process.env.JWT_SECRET);
-        }
-
-        console.log("✅ Authenticated User:", req.user);
-        next();
-    } catch (error) {
-        console.error("JWT verification failed:", error);
-        return res.status(401).json({ success: false, message: "Invalid or expired token" });
-    }
 };
 
-module.exports = { isAuthenticated };
+module.exports = {isAuthenticated}
