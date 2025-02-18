@@ -192,8 +192,6 @@ const updateAttendance = async (req, res) => {
   const { employeeId } = req.params; // Assuming employeeId is passed as a route parameter
   const updateData = req.body; // Fields to update (e.g., checkIn, checkOut)
 
-
-
   try {
     // Validate employeeId and updateData
     if (!employeeId || !updateData) {
@@ -210,30 +208,54 @@ const updateAttendance = async (req, res) => {
         message: "Invalid date format",
       });
     }
-    
+
     // Convert the date to Indian Standard Time (IST)
     attendanceDate.setHours(attendanceDate.getHours() + 5);
     attendanceDate.setMinutes(attendanceDate.getMinutes() + 30);
-    
+
     // Normalize the date to the start and end of the day in IST
     const startOfDay = new Date(attendanceDate);
     startOfDay.setUTCHours(0, 0, 0, 0); // Start of the day in IST
     const endOfDay = new Date(attendanceDate);
     endOfDay.setUTCHours(23, 59, 59, 999); // End of the day in IST
-   
 
     // Attempt to find an existing attendance record for the specific employee and date
     const existingAttendance = await Attendance.findOne({
       employeeId,
-      date: { $gte: startOfDay, $lt: endOfDay }
+      date: { $gte: startOfDay, $lt: endOfDay },
     });
 
     if (existingAttendance) {
+      // If no checkout time is provided, keep the existing one, else update it
+      const checkIn = updateData.checkIn || existingAttendance.checkIn;
+      const checkOut = updateData.checkOut || existingAttendance.checkOut; // If checkOut is blank, keep the existing value
+
+      let totalHours = existingAttendance.totalHours;
+      let overtimeHours = existingAttendance.overtimeHours;
+
+      // If checkOut is provided, calculate total and overtime hours
+      if (checkOut) {
+        const checkInTime = new Date(checkIn);
+        const checkOutTime = new Date(checkOut);
+
+        const duration = (checkOutTime - checkInTime) / (1000 * 60 * 60); // Convert milliseconds to hours
+        totalHours = Math.max(0, duration); // Ensure non-negative
+        overtimeHours = Math.max(0, totalHours - 8); // Assuming 8 hours is standard work time
+      }
+
       // Update the existing attendance record
       const updatedAttendance = await Attendance.findOneAndUpdate(
-        { employeeId, _id: existingAttendance._id }, // Filter by employeeId and existing record ID
-        { $set: updateData }, // Update with the provided data
-        { new: true, runValidators: true } // Return the updated document and apply validations
+        { employeeId, _id: existingAttendance._id },
+        {
+          $set: {
+            checkIn,
+            checkOut,
+            totalHours,
+            overtimeHours,
+            wages: updateData.wages || existingAttendance.wages,
+          },
+        },
+        { new: true, runValidators: true }
       );
 
       // Success response with the updated attendance
@@ -241,17 +263,27 @@ const updateAttendance = async (req, res) => {
     } else {
       // If no record was found, create a new attendance record
       const checkIn = new Date(`1970-01-01T${updateData.checkIn}:00Z`).toISOString(); // Use a dummy date for time
-      const checkOut = new Date(`1970-01-01T${updateData.checkOut}:00Z`).toISOString(); // Use a dummy date for time
-      const duration = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60); // Convert milliseconds to hours
-      const totalHours = Math.max(0, duration); // Ensure non-negative
-      const overtimeHours = Math.max(0, duration - 8); // Assuming 8 hours is standard work time
+      const checkOut = updateData.checkOut || null; // Allow blank checkOut (null)
+
+      let totalHours = 0;
+      let overtimeHours = 0;
+
+      // Only calculate hours if checkOut is provided
+      if (checkOut) {
+        const checkInTime = new Date(checkIn);
+        const checkOutTime = new Date(checkOut);
+
+        const duration = (checkOutTime - checkInTime) / (1000 * 60 * 60); // Convert milliseconds to hours
+        totalHours = Math.max(0, duration); // Ensure non-negative
+        overtimeHours = Math.max(0, totalHours - 8); // Assuming 8 hours is standard work time
+      }
 
       // Create a new attendance record
       const attendanceData = {
         employeeId,
         date: attendanceDate, // Use the parsed date
         checkIn: updateData.checkIn,
-        checkOut: updateData.checkOut,
+        checkOut,
         totalHours,
         overtimeHours,
         wages: updateData.wages || 0, // Assuming wages can be passed in updateData
@@ -267,6 +299,7 @@ const updateAttendance = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 const deleteAttendance = async (req, res) => {
   const { employeeId } = req.params; // Extracting the ID from request parameters

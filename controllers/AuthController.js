@@ -96,7 +96,12 @@ const signup = async (req, res) => {
 
         await newUser.save();
 
-        const token = jwt.sign({ id: newUser._id, email: newUser.email }, JWT_SECRET, { expiresIn: "7d" });
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email },
+            JWT_SECRET,
+            { expiresIn: "7d", algorithm: "HS256" }
+        );
+        
 
         return res.status(201).json({
             success: true,
@@ -135,7 +140,12 @@ const login = async (req, res) => {
             return res.status(401).json({ success: false, message: "Invalid email or password" });
         }
 
-        const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "7d" });
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        
 
         res.status(200).json({
             success: true,
