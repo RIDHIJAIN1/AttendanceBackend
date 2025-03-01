@@ -35,6 +35,7 @@ mongoose.connect(MONGODB_URI, {
 
 // CORS Settings
 const allowedOrigins = [
+  'https://attendance-frontend-88xi.vercel.app'
   'https://attendance-frontend-one.vercel.app'
   'http://localhost:5173',
   process.env.CLIENT_URL,
