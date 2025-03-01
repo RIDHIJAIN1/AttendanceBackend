@@ -35,8 +35,8 @@ mongoose.connect(MONGODB_URI, {
 
 // CORS Settings
 const allowedOrigins = [
-  'https://attendance-frontend-88xi.vercel.app'
-  'https://attendance-frontend-one.vercel.app'
+  'https://attendance-frontend-88xi.vercel.app',
+  'https://attendance-frontend-one.vercel.app',
   'http://localhost:5173',
   process.env.CLIENT_URL,
 ];
@@ -48,20 +48,28 @@ const allowedOrigins = [
 // const upload = multer({ storage: storage });
 
 
-const corsOptions = {
-  origin: allowedOrigins,
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-};
-app.use(cors(corsOptions));
+  credentials: true
+}));
+// app.use(cors(corsOptions));
 
 // File storage .
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes will be written here 
 // app.use('/', admin);
+
 app.use('/', routes);
+
 
 // App Start
 
