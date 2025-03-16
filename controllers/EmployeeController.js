@@ -76,9 +76,7 @@ const getEmployeeById = async (req, res) => {
   try {
       // Fetch the employee by ID
       const employee = await Employee.findOne({_id:id , isDeleted:false});
-      
-      console.log(id);
-      console.log(employee);
+
 
       // Check if employee exists
       if (!employee) {

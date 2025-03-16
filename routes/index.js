@@ -3,7 +3,10 @@ const EmployeeController = require('../controllers/EmployeeController');
 const AuthController = require('../controllers/AuthController');
 const AttendanceController = require('../controllers/AttendanceController');
 const PayrollController = require('../controllers/PayrollController');
+const RazorpayController = require('../controllers/RazorpayController');
+
 const { isAuthenticated } = require('../middlewares/Authenticated');
+
 const {upload}  = require('../middlewares/upload');
 const { route } = require('../app');
 // const upload = require('../utils/multerConfig'); // Import the multer configuration
@@ -35,6 +38,10 @@ router.delete('/attendance/:employeeId',isAuthenticated, AttendanceController.de
 
 router.post('/payroll/:employeeId/:month',isAuthenticated, PayrollController.createOrUpdatePayroll);
 router.get('/payroll', PayrollController.getPayrolls);
+
+
+router.post('/createOrder', RazorpayController.createOrder)
+router.post('/verifyOrder', RazorpayController.verifyOrder)
 
 
 

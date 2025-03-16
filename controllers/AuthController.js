@@ -11,7 +11,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Google OAuth Flow - Step 1: Redirect to Google's OAuth 2.0 server
 const googleAuth = async (req, res) => {
     const url = `https://accounts.google.com/o/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid+profile+email&response_type=code`;
-    console.log(url);
     res.redirect(url);
 };
 

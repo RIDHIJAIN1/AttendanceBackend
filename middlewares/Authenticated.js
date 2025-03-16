@@ -16,11 +16,8 @@ const User = require("../models/User");
     
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("decoded" , decoded)
 
     req.user = await User.findById(decoded.id);
-
-console.log("decoded " , req.user)
     if (!req.user) {
       return res.status(401).json({
         success: false,
